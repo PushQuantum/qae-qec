@@ -1,5 +1,5 @@
 # Quantum Autoencoders for Quantum Error Correction
-This a project aimed at replicating the results from the arXiV paper on using [Quantum Autoencoders for Quantum Error Correction](https://arxiv.org/abs/2202.00555). The results in this paper was achieved by using DQNNs (Disspiative Quantum Neural Networks) with code written in MATLAB and they are numerical simulation results. 
+This a project aimed at replicating the results from the arXiV paper on using [Quantum Autoencoders for Quantum Error Correction](https://arxiv.org/abs/2202.00555). The results in this paper was achieved by using DQNNs ([Disspiative Quantum Neural Networks](https://github.com/qigitphannover/DeepQuantumNeuralNetworks)) with code written in MATLAB and they are numerical simulation results. 
 
 Desired Objectives for this project:
 -[ ] Replicate the results but using Python 
