@@ -8,5 +8,3 @@ Desired Objectives for this project:
 - [ ] Run the learned encodings and decodings on actual hardware.        
 - [ ] Try gradient free methods for neural network training, trying an alternate solution for the Barren Plateau problem.
 
-## Contributors
-@isolatedinformation, Gamze. Thanks @vgg-consulting for advising the project.
