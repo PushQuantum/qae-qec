@@ -1,2 +1,5 @@
 .python-version
 .vscode/
+*pyc
+nohup.out
+*.ipynb_checkpoints*
