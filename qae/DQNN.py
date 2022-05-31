@@ -1,6 +1,7 @@
 ######  Code for Feedforward Quantum Neural Networks
 
 ### Package-imports, universal definitions and remarks
+from this import d
 import scipy as sc
 import qutip as qt
 import pandas as pd
@@ -233,6 +234,30 @@ def makeUpdateMatrix(qnnArch, unitaries, trainingData, storedStates, lda, ep, l,
     summ = (-ep * (2 ** numInputQubits) / (lda * len(trainingData))) * summ
     return summ.expm()
 
+def makeUpdateMatrix_selfInverse(qnnArch, unitaries, trainingData, storedStates, lda, ep, L, j):
+    
+    numInputQubits = qnnArch[l - 1]
+
+    # Calculate the sum:
+    summ = 0
+    for x in range(len(trainingData)):
+        # Calculate the commutator
+        firstPart = updateMatrixFirstPart(qnnArch, unitaries, storedStates, l, j, x)
+        secondPart = updateMatrixSecondPart(qnnArch, unitaries, trainingData, l, j, x)
+        mat = qt.commutator(firstPart, secondPart)
+
+        # Trace out the rest
+        keep = list(range(numInputQubits))
+        keep.append(numInputQubits + j)
+        mat = partialTraceKeep(mat, keep)
+
+        # Add to sum
+        summ = summ + mat
+
+    # Calculate the update matrix from the sum
+    summ = (-ep * (2 ** numInputQubits) / (lda * len(trainingData))) * summ
+    return summ.expm()
+
 
 def updateMatrixFirstPart(qnnArch, unitaries, storedStates, l, j, x):
     numInputQubits = qnnArch[l - 1]
@@ -271,6 +296,15 @@ def updateMatrixSecondPart(qnnArch, unitaries, trainingData, l, j, x):
 
 
 def makeUpdateMatrixTensored(qnnArch, unitaries, lda, ep, trainingData, storedStates, l, j):
+    numInputQubits = qnnArch[l - 1]
+    numOutputQubits = qnnArch[l]
+
+    res = makeUpdateMatrix(qnnArch, unitaries, lda, ep, trainingData, storedStates, l, j)
+    if numOutputQubits - 1 != 0:
+        res = qt.tensor(res, tensoredId(numOutputQubits - 1))
+    return swappedOp(res, numInputQubits, numInputQubits + j)
+
+def makeUpdateMatrixTensored_selfInverse(qnnArch, unitaries, lda, ep, trainingData, storedStates, l, j):
     numInputQubits = qnnArch[l - 1]
     numOutputQubits = qnnArch[l]
 
