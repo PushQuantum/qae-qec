@@ -314,7 +314,7 @@ def makeUpdateMatrixTensored_selfInverse(qnnArch, unitaries, lda, ep, trainingDa
     return swappedOp(res, numInputQubits, numInputQubits + j)
 
 
-def qnnTraining(qnnArch, initialUnitaries, trainingData, lda, ep, trainingRounds, alert=0):
+def qnnTraining(qnnArch, initialUnitaries, trainingData, lda, ep, trainingRounds, alert=0) -> List:
     ### FEEDFORWARD
     # Feedforward for given unitaries
     s = 0
