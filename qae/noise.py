@@ -4,10 +4,12 @@ import numpy as np
 # import qutip as qt
 import cirq
 from dataclasses import  dataclass, field, asdict
-
-# import pandas as pd
 import pandas as pd
+import pickle
+import pathlib
+from datetime import date
 from utils import pure_logical_plus, pure_logical_one, pure_logical_zero
+import json
 
 INIT_SEED = 123124
 default_rng = np.random.default_rng(seed= INIT_SEED)
@@ -56,8 +58,8 @@ def sample_circuit(qubits: List['cirq.ops.Qid'], circuit: "cirq.Circuit", sample
 class Noise:
     noise_type: str
     error_probability: float = 0.1
-    training_pairs: tuple = field(default_factory=lambda: ()) #[...,(state_label, noised_dm, pure_dm),...]
     num_qubits: int = field(init= False)
+    training_pairs: tuple = field(default_factory=lambda: ()) #[...,(state_label, noised_dm, pure_dm),...]
 
     def __post_init__(self):
         allowed_noise_channels = ["bit-flip", "phase-flip", "depolarizing", "erasure"]
@@ -100,20 +102,44 @@ class Noise:
         self.num_qubits = num_qubits
         logical_states = LOGICAL_STATES if logical_states is None else logical_states
         qubits = cirq.LineQubit.range(num_qubits)
-        training_pairs = [TrainingPair(state, self.prepare_noised_density_matrix(state, qubits), prepare_pure_logical_state(num_qubits) ) for state in logical_states for _ in range(num_training_pairs)]
+        self.training_pairs = [TrainingPair(state, self.prepare_noised_density_matrix(state, qubits), prepare_pure_logical_state(state, num_qubits)) for state in logical_states for _ in range(num_training_pairs)]
+        return self.training_pairs
 
-    def save_dataset(self):
-        NotImplementedError
+    def save_dataset(self, file_folder:str = None, file_name: str = None):
+        """
 
-    @static
-    def load_dataset(path_to_dataset: str):
-        NotImplementedError
-#
-# def convert_complex_num_json_to_numpy(arr: np.ndarray):
-#     for row in range(np.shape(arr)[0]):
-#         for col in range(np.shape(arr)[1]):
-#             arr[row][col] = complex(*reversed(list(arr[row][col].values())))
-#     return arr
+        @param file_folder: The path of the folder in which the files will go
+        @param file_name: The file name for the pickle
+        @return: filename.pkl, that stores the Noise object, filename.json, that stores the hyoerparameters in a humaa readable form.
+        """
+        if file_name is None:
+            file_name = f"{self.num_qubits}_{self.noise_type}_{str(self.error_probability).replace('.','-')}_{len(self.training_pairs)}"
+        if file_folder is None:
+            file_folder = f"assets/{str(date.today()).replace('-','_')}"
+            pathlib.Path(file_folder).mkdir(parents = True, exist_ok = True)
+        hp_keys = ['num_qubits','noise_type','error_probability']
+        hp = dict()
+        hp['pickle_path'] = f"{file_folder}/{file_name}.pkl"
+        for key in hp_keys:
+            hp[key] = self.__dict__[key]
+        print(hp)
+        with open(f"{file_folder}/{file_name}.pkl","wb") as f:
+            pickle.dump(self, f)
+        with open(f"{file_folder}/{file_name}.json","w") as f:
+            json.dump(hp, f)
+
+    @staticmethod
+    def load_dataset(path_to_json: str):
+        """
+        input: json which containts the path to the pickle.
+        returns : Noise object
+        """
+        with open(path_to_json, "r") as f:
+            hp  = json.load(f)
+            pkl_path = hp['pickle_path']
+        with open(pkl_path,"rb") as obj:
+            return pickle.load(obj)
+
 
 class NoiseSweep:
     allowed_params = ('error_probability', 'noise_type')

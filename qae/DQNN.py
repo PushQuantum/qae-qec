@@ -2,6 +2,7 @@
 
 ### Package-imports, universal definitions and remarks
 from this import d
+from typing import List
 import scipy as sc
 import qutip as qt
 import pandas as pd
