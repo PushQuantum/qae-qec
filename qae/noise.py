@@ -23,6 +23,13 @@ LOGICAL_STATES = ['0_L','1_L','+_L']
 TrainingPair = namedtuple("TrainingPair","state noised_state pure_state") # used namedtuple for more readable code.
 
 def prepare_pure_logical_state(state:str, num_qubits: int) -> np.ndarray:
+    """
+    Prepare reference states for training the autoencoder
+    @param state: logical input state from {''0_L','1_L','+_L''}
+    @param num_qubits: num of qubits in the logical state
+    @return: density matrix representing the pure logical states
+    """
+
     if state == "0_L":
         return pure_logical_zero(num_qubits)
     elif state == "1_L":
@@ -33,6 +40,13 @@ def prepare_pure_logical_state(state:str, num_qubits: int) -> np.ndarray:
         raise "given logical state cannot be prepared yet!"
 
 def prepare_noised_logical_state(state:str, qubits:List) -> Union["cirq.Moment", "cirq.Circuit"]:
+    """
+    Preference training states for training the autoencoder
+    The states are generated from sampling a cirq circuit with a noise channel.
+    @param state: logical input state from {''0_L','1_L','+_L''}
+    @param qubits: num of qubits in the logical state
+    @return: cirq Circuit to sample the noised states from
+    """
     if state == "0_L":
         return cirq.Moment([])
     elif state == "1_L":
@@ -56,6 +70,13 @@ def sample_circuit(qubits: List['cirq.ops.Qid'], circuit: "cirq.Circuit", sample
 
 @dataclass
 class Noise:
+    """
+    Class to generate dataset for training autoencoders
+    noise_type: str -- {"bit-flip", "phase-flip", "depolarizing", "erasure"}
+    error_probability: the probability of a single qubit undergoing an error
+    num_qubits: number of qubits in the logical state
+    training_pairs: the generated {noised, reference} pair
+    """
     noise_type: str
     error_probability: float = 0.1
     num_qubits: int = field(init= False)
@@ -110,7 +131,7 @@ class Noise:
 
         @param file_folder: The path of the folder in which the files will go
         @param file_name: The file name for the pickle
-        @return: filename.pkl, that stores the Noise object, filename.json, that stores the hyoerparameters in a humaa readable form.
+        @return: filename.pkl, that stores the Noise object, filename.json, that stores the hyperparams in a human readable form.
         """
         if file_name is None:
             file_name = f"{self.num_qubits}_{self.noise_type}_{str(self.error_probability).replace('.','-')}_{len(self.training_pairs)}"
