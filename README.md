@@ -3,12 +3,12 @@ This a project aimed at replicating the results from the arXiV paper on using [Q
 
 Desired Objectives for this project:
 
-- [ ] Replicate the results but using Python. Insiped from [DQNN Repo](https://github.com/qigitphannover/DeepQuantumNeuralNetworks/tree/master/Autoencoder-MATLAB)
-  - [ ] Make datasets and dataset generation code public.     
+- [x] Replicate the results but using Python. Insiped from [DQNN Repo](https://github.com/qigitphannover/DeepQuantumNeuralNetworks/tree/master/Autoencoder-MATLAB)
+  - [x] Make datasets and dataset generation code public.     
 - [ ] Run the learned encodings and decodings on actual hardware.        
 - [ ] Try gradient free methods for neural network training, trying an alternate solution for the Barren Plateau problem.
 
-Status on 08.06.2022: Currently under active developements. Datasets have been generated, and will be made available soon, pending some verfication. Coming soon,  
+https://1drv.ms/p/s!AhzKZHA1xnhDiK9wIC2fFvj9QZDEKg?e=LzqNnt - Short presentation explaning the theory of the paper.
 
 
 ------------------------------------------
